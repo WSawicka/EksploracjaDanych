@@ -43,13 +43,6 @@ public class SpaceVectorService {
 				SpaceVector vector = new SpaceVector();
 				vector.getCoordinateBorders().put(0, new SpaceVector.Border(sortedLineValues.get(0).get(i), sortedLineValues.get(0).get(i + 1)));
 				vector.getCoordinateBorders().put(1, new SpaceVector.Border(sortedLineValues.get(1).get(j), sortedLineValues.get(1).get(j + 1)));
-
-				String xmin = vector.getCoordinateBorders().get(0).getMin().equals(BigDecimal.valueOf(Double.MIN_VALUE)) ? "-INFINITY" : vector.getCoordinateBorders().get(0).getMin().toString();
-				String xmax = vector.getCoordinateBorders().get(0).getMax().equals(BigDecimal.valueOf(Double.MAX_VALUE)) ? "INFINITY" : vector.getCoordinateBorders().get(0).getMax().toString();
-				String ymin = vector.getCoordinateBorders().get(1).getMin().equals(BigDecimal.valueOf(Double.MIN_VALUE)) ? "-INFINITY" : vector.getCoordinateBorders().get(1).getMin().toString();
-				String ymax = vector.getCoordinateBorders().get(1).getMax().equals(BigDecimal.valueOf(Double.MAX_VALUE)) ? "INFINITY" : vector.getCoordinateBorders().get(1).getMax().toString();
-
-				System.out.println("V: x[" + xmin + ", " + xmax + "]  y[" + ymin + ", " + ymax + "]\n");
 				vectors.add(vector);
 			}
 		}
@@ -58,7 +51,7 @@ public class SpaceVectorService {
 			for (SpaceVector vector : vectors) {
 				BigDecimal min = vector.getCoordinateBorders().get(line.getCoordinate()).getMin();
 				BigDecimal max = vector.getCoordinateBorders().get(line.getCoordinate()).getMax();
-				if(min.doubleValue() == line.getValue().doubleValue() && !line.isAsc() ||
+				if (min.doubleValue() == line.getValue().doubleValue() && !line.isAsc() ||
 						max.doubleValue() == line.getValue().doubleValue() && line.isAsc()) {
 					vector.getVector().add(true);
 					vector.setGroup(line.getGroupAccepted());
@@ -68,6 +61,9 @@ public class SpaceVectorService {
 			}
 		}
 
-		vectors.forEach(v -> System.out.println(v.getVectortoString() + " -> " + ((v.getGroup() == null) ? "-" : v.getGroup())));
+		vectors.forEach(vector -> {
+			vector.getCoordinateBorders().forEach((k,v) -> System.out.print(v.toString() + " "));
+			System.out.println("\t" + vector.getVectortoString() + " -> " + ((vector.getGroup() == null) ? "-" : vector.getGroup()));
+		});
 	}
 }

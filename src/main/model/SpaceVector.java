@@ -23,8 +23,8 @@ public class SpaceVector {
 	}
 
 	public String getVectortoString() {
-		StringBuilder builder  = new StringBuilder();
-		builder.append("[ ");
+		StringBuilder builder = new StringBuilder();
+		builder.append("\t[ ");
 		vector.forEach(v -> builder.append((v) ? "1 " : "0 "));
 		return builder.append("]").toString();
 	}
@@ -35,6 +35,15 @@ public class SpaceVector {
 	public static class Border {
 		private BigDecimal min;
 		private BigDecimal max;
+
+		public String toString() {
+			String xmin = min.equals(BigDecimal.valueOf(Double.MIN_VALUE)) ? "-INFIN" : min.setScale(3, BigDecimal.ROUND_HALF_UP).toString();
+			String xmax = max.equals(BigDecimal.valueOf(Double.MAX_VALUE)) ? "INFIN" : max.setScale(3, BigDecimal.ROUND_HALF_UP).toString();
+			String ymin = min.equals(BigDecimal.valueOf(Double.MIN_VALUE)) ? "-INFIN" : min.setScale(3, BigDecimal.ROUND_HALF_UP).toString();
+			String ymax = max.equals(BigDecimal.valueOf(Double.MAX_VALUE)) ? "INFIN" : max.setScale(3, BigDecimal.ROUND_HALF_UP).toString();
+
+			return "x[" + xmin + ", " + xmax + "]  y[" + ymin + ", " + ymax + "]";
+		}
 	}
 }
 
