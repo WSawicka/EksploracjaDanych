@@ -7,6 +7,7 @@ import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import main.model.DividingLine;
+import main.service.SpaceVectorService;
 import main.viewHelp.AlertWindow;
 import main.Chart2D;
 import main.viewHelp.ExcelView;
@@ -14,7 +15,7 @@ import main.file.ReadTxtFile;
 import main.file.ReadXlsFile;
 import main.model.enums.AlertEnum;
 import main.model.AppData;
-import main.service.SpaceDivider;
+import main.service.SpaceDivideService;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
 import java.io.IOException;
@@ -59,9 +60,11 @@ public class MainWindowController {
 
 	@FXML
 	private void handleDivide(ActionEvent event) throws Exception {
-		SpaceDivider divider = new SpaceDivider();
-		List<DividingLine> lines = divider.divide();
+		SpaceDivideService divideService = new SpaceDivideService();
+		List<DividingLine> lines = divideService.divide();
 		System.out.println("\nGOT: " + lines.size() + " lines.");
+		SpaceVectorService vectorService = new SpaceVectorService(lines);
+		vectorService.createVectors();
 	}
 
 	@FXML

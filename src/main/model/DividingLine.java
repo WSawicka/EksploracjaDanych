@@ -2,7 +2,6 @@ package main.model;
 
 import lombok.Getter;
 import lombok.Setter;
-import main.model.enums.DimensionEnum;
 
 import java.math.BigDecimal;
 
@@ -10,5 +9,6 @@ import java.math.BigDecimal;
 @Setter
 public class DividingLine {
 	private BigDecimal value;
-	private DimensionEnum coordinate;
+	private Integer coordinate;
+	private boolean isAsc; // accepted and deleted points side
 }

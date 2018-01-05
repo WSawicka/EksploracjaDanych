@@ -9,19 +9,18 @@ import main.model.DividingDataSet;
 import main.model.DividingLine;
 import main.model.Point;
 import main.model.enums.AlertEnum;
-import main.model.enums.DimensionEnum;
 import main.viewHelp.AlertWindow;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.*;
 
-public class SpaceDivider {
+public class SpaceDivideService {
 	private int coordinatesAmount;
-	private List<Point> points = AppData.getInstance().getDataAsPoints();
 	private Map<Integer, List<Point>> sortedPoints = new HashMap<>();
 
-	public SpaceDivider() {
+	public SpaceDivideService() {
+		List<Point> points = AppData.getInstance().getDataAsPoints();
 		coordinatesAmount = points.get(0).getVector().size();
 
 		for (int coordinate = 0; coordinate < coordinatesAmount; coordinate++) {
@@ -62,8 +61,6 @@ public class SpaceDivider {
 
 	private DividingDataSet getDataSet() {
 		DividingDataSet dataSet = new DividingDataSet();
-
-		//TODO: zrobić dodatkowe sprawdzanie wartości!!! co, jeśli na tej samej linii są punkty z dwóch grup? - PUNKTY NIE MOGĄ BYĆ NA LINII
 
 		for (Map.Entry<Integer, List<Point>> sorted : sortedPoints.entrySet()) {
 			DividingDataSet newDataSetAsc = getDataFor(sorted, true);
@@ -147,7 +144,7 @@ public class SpaceDivider {
 
 	private DividingLine getLineFrom(DividingDataSet dataSet) {
 		DividingLine divideLine = new DividingLine();
-		divideLine.setCoordinate(DimensionEnum.values()[dataSet.getMaxPointsCoord()]);
+		divideLine.setCoordinate(dataSet.getMaxPointsCoord());
 
 		BigDecimal afterLine = sortedPoints.get(dataSet.getMaxPointsCoord()).get(dataSet.getFirstOutPointIndex()).getVector().get(dataSet.getMaxPointsCoord());
 
@@ -157,6 +154,7 @@ public class SpaceDivider {
 
 		BigDecimal lineValue = (afterLine.add(beforeLine)).divide(BigDecimal.valueOf(2.0), BigDecimal.ROUND_HALF_UP);
 		divideLine.setValue(lineValue);
+		divideLine.setAsc(dataSet.isAsc());
 		return divideLine;
 	}
 

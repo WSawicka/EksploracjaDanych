@@ -7,7 +7,6 @@ import javafx.stage.Stage;
 import main.model.AppData;
 import main.model.DividingLine;
 import main.model.enums.AlertEnum;
-import main.model.enums.DimensionEnum;
 import main.viewHelp.AlertWindow;
 import main.viewHelp.ScatterXChart;
 
@@ -45,7 +44,7 @@ public class Chart2D {
 		final ScatterXChart<Number, Number> scatterChart = new ScatterXChart<>(xAxis, yAxis);
 
 		if (!lines.isEmpty()) {
-			lines.forEach(line -> scatterChart.addValueMarker(new XYChart.Data<>(line.getValue(), line.getValue()), line.getCoordinate().equals(DimensionEnum.X)));
+			lines.forEach(line -> scatterChart.addValueMarker(new XYChart.Data<>(line.getValue(), line.getValue()), line.getCoordinate() == 0));
 		}
 
 		scatterChart.setTitle("Chart: " + titleX + " of " + titleY);
