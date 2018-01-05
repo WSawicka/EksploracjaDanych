@@ -9,6 +9,6 @@ import java.util.List;
 @Getter
 @Setter
 public class Point {
-    private List<BigDecimal> vector;
-    private int group;
+	private List<BigDecimal> vector;
+	private int group;
 }

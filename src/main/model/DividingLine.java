@@ -9,6 +9,6 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 public class DividingLine {
-    private BigDecimal value;
-    private DimensionEnum coordinate;
+	private BigDecimal value;
+	private DimensionEnum coordinate;
 }

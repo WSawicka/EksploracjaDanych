@@ -19,68 +19,68 @@ import org.controlsfx.control.spreadsheet.SpreadsheetView;
 import java.io.IOException;
 
 public class MainWindowController {
-    private String filePath;
-    private AppData appData = AppData.getInstance();
+	private String filePath;
+	private AppData appData = AppData.getInstance();
 
-    @FXML
-    private AnchorPane pane;
+	@FXML
+	private AnchorPane pane;
 
-    @FXML
-    private void handleOpenTxtFile(ActionEvent event) throws Exception {
-        ReadTxtFile readFile = new ReadTxtFile();
-        try {
-            readFile.readFile();
-            filePath = readFile.getFilePath();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        appData.setTitles(readFile.getTitles());
-        appData.setData(readFile.getMap());
+	@FXML
+	private void handleOpenTxtFile(ActionEvent event) throws Exception {
+		ReadTxtFile readFile = new ReadTxtFile();
+		try {
+			readFile.readFile();
+			filePath = readFile.getFilePath();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		appData.setTitles(readFile.getTitles());
+		appData.setData(readFile.getMap());
 
-        updateTableView();
-    }
+		updateTableView();
+	}
 
-    @FXML
-    private void handleOpenXlsFile(ActionEvent event) throws Exception {
-        ReadXlsFile readFile = new ReadXlsFile();
-        try {
-            readFile.readFile();
-            filePath = readFile.getFilePath();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        appData.setTitles(readFile.getTitles());
-        appData.setData(readFile.getMap());
+	@FXML
+	private void handleOpenXlsFile(ActionEvent event) throws Exception {
+		ReadXlsFile readFile = new ReadXlsFile();
+		try {
+			readFile.readFile();
+			filePath = readFile.getFilePath();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		appData.setTitles(readFile.getTitles());
+		appData.setData(readFile.getMap());
 
-        updateTableView();
-    }
+		updateTableView();
+	}
 
-    @FXML
-    private void handleDivide(ActionEvent event) throws Exception {
-        SpaceDivider divider = new SpaceDivider();
-        divider.divide();
-    }
+	@FXML
+	private void handleDivide(ActionEvent event) throws Exception {
+		SpaceDivider divider = new SpaceDivider();
+		divider.divide();
+	}
 
-    @FXML
-    private void handleShow2D(ActionEvent event) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/MainWindow.fxml"));
-        Scene newScene = new Scene(loader.load());
-        Stage newStage = new Stage();
-        newStage.setScene(newScene);
+	@FXML
+	private void handleShow2D(ActionEvent event) throws IOException {
+		FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/MainWindow.fxml"));
+		Scene newScene = new Scene(loader.load());
+		Stage newStage = new Stage();
+		newStage.setScene(newScene);
 
-        Chart2D chart = new Chart2D(newStage);
-        try {
-            chart.showInWindow(0, 1, 2);
-        } catch (NumberFormatException nfex) {
-            new AlertWindow().show(AlertEnum.NOT_NUMERIC_VALUE);
-        }
-    }
+		Chart2D chart = new Chart2D(newStage);
+		try {
+			chart.showInWindow(0, 1, 2);
+		} catch (NumberFormatException nfex) {
+			new AlertWindow().show(AlertEnum.NOT_NUMERIC_VALUE);
+		}
+	}
 
-    private void updateTableView() {
-        ExcelView excelView = new ExcelView();
-        SpreadsheetView spreadsheetView = excelView.getView(appData.getDataWithTitles());
-        spreadsheetView.setPrefSize(pane.getWidth(), pane.getHeight());
-        spreadsheetView.setEditable(false);
-        pane.getChildren().add(spreadsheetView);
-    }
+	private void updateTableView() {
+		ExcelView excelView = new ExcelView();
+		SpreadsheetView spreadsheetView = excelView.getView(appData.getDataWithTitles());
+		spreadsheetView.setPrefSize(pane.getWidth(), pane.getHeight());
+		spreadsheetView.setEditable(false);
+		pane.getChildren().add(spreadsheetView);
+	}
 }
