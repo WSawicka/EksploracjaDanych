@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 @Setter
 public class DividingLine {
 	private BigDecimal value;
-	private Integer coordinate;
+	private int coordinate;
 	private boolean isAsc; // accepted and deleted points side
+	private int groupAccepted;
 }

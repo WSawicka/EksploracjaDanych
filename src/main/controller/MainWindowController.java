@@ -62,7 +62,6 @@ public class MainWindowController {
 	private void handleDivide(ActionEvent event) throws Exception {
 		SpaceDivideService divideService = new SpaceDivideService();
 		List<DividingLine> lines = divideService.divide();
-		System.out.println("\nGOT: " + lines.size() + " lines.");
 		SpaceVectorService vectorService = new SpaceVectorService(lines);
 		vectorService.createVectors();
 	}

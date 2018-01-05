@@ -49,11 +49,25 @@ public class SpaceVectorService {
 				String ymin = vector.getCoordinateBorders().get(1).getMin().equals(BigDecimal.valueOf(Double.MIN_VALUE)) ? "-INFINITY" : vector.getCoordinateBorders().get(1).getMin().toString();
 				String ymax = vector.getCoordinateBorders().get(1).getMax().equals(BigDecimal.valueOf(Double.MAX_VALUE)) ? "INFINITY" : vector.getCoordinateBorders().get(1).getMax().toString();
 
-				System.out.println("\nV: x[" + xmin + ", " + xmax + "]  y[" + ymin + ", " + ymax + "]");
+				System.out.println("V: x[" + xmin + ", " + xmax + "]  y[" + ymin + ", " + ymax + "]\n");
 				vectors.add(vector);
 			}
 		}
 
-		System.out.println("sup");
+		for (DividingLine line : lines) {
+			for (SpaceVector vector : vectors) {
+				BigDecimal min = vector.getCoordinateBorders().get(line.getCoordinate()).getMin();
+				BigDecimal max = vector.getCoordinateBorders().get(line.getCoordinate()).getMax();
+				if(min.doubleValue() == line.getValue().doubleValue() && !line.isAsc() ||
+						max.doubleValue() == line.getValue().doubleValue() && line.isAsc()) {
+					vector.getVector().add(true);
+					vector.setGroup(line.getGroupAccepted());
+				} else {
+					vector.getVector().add(false);
+				}
+			}
+		}
+
+		vectors.forEach(v -> System.out.println(v.getVectortoString() + " -> " + ((v.getGroup() == null) ? "-" : v.getGroup())));
 	}
 }

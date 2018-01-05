@@ -155,6 +155,7 @@ public class SpaceDivideService {
 		BigDecimal lineValue = (afterLine.add(beforeLine)).divide(BigDecimal.valueOf(2.0), BigDecimal.ROUND_HALF_UP);
 		divideLine.setValue(lineValue);
 		divideLine.setAsc(dataSet.isAsc());
+		divideLine.setGroupAccepted(sortedPoints.get(dataSet.getMaxPointsCoord()).get(dataSet.getLastInPointIndex()).getGroup());
 		return divideLine;
 	}
 

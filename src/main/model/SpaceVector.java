@@ -15,11 +15,18 @@ import java.util.Map;
 public class SpaceVector {
 	private Map<Integer, Border> coordinateBorders;
 	private List<Boolean> vector;
-	private int group;
+	private Integer group;
 
 	public SpaceVector() {
 		this.coordinateBorders = new HashMap<>();
 		this.vector = new ArrayList<>();
+	}
+
+	public String getVectortoString() {
+		StringBuilder builder  = new StringBuilder();
+		builder.append("[ ");
+		vector.forEach(v -> builder.append((v) ? "1 " : "0 "));
+		return builder.append("]").toString();
 	}
 
 	@Getter
