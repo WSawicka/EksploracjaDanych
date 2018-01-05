@@ -32,19 +32,17 @@ public class SpaceDivider {
 		}
 	}
 
-	public void divide() throws IOException {
+	public List<DividingLine> divide() throws IOException {
 		List<DividingLine> lines = new ArrayList<>();
 
 		while (true) {
 			DividingDataSet dataSet = getDataSet();
 
-			if (dataSet.getMaxPointsAmount() + 1 == sortedPoints.get(dataSet.getMaxPointsCoord()).size()) {
+			if (dataSet.getMaxPointsAmount() + 1 == sortedPoints.get(dataSet.getMaxPointsCoord()).size() || dataSet.getMaxPointsAmount() == 0) {
 				break;
 			}
 
-			if (coordinatesAmount == 2) {
-				lines.add(getLineFrom(dataSet));
-			}
+			lines.add(getLineFrom(dataSet));
 
 			int pointsAmount = sortedPoints.get(dataSet.getMaxPointsCoord()).size();
 			if (dataSet.isAsc()) {
@@ -56,7 +54,10 @@ public class SpaceDivider {
 			sortPointsApartFrom(sortedPoints.get(dataSet.getMaxPointsCoord()), dataSet.getMaxPointsCoord());
 		}
 
-		showChartWithLines(lines);
+		if (coordinatesAmount == 2) {
+			showChartWithLines(lines);
+		}
+		return lines;
 	}
 
 	private DividingDataSet getDataSet() {
@@ -82,29 +83,57 @@ public class SpaceDivider {
 		DividingDataSet dataSet = new DividingDataSet();
 		int pointsToDeleteAmount = 0;
 		int lastPointIndex = 0;
+		int coord = sorted.getKey();
 
 		if (isAsc) {
 			for (int pointIndex = 0; pointIndex < sorted.getValue().size() - 1; pointIndex++) {
-				if (sorted.getValue().get(pointIndex).getGroup() == sorted.getValue().get(pointIndex + 1).getGroup()) {
-					pointsToDeleteAmount++;
+				Point actual = sorted.getValue().get(pointIndex);
+				Point next = sorted.getValue().get(pointIndex + 1);
+
+				if (!actual.getVector().get(coord).equals(next.getVector().get(coord))) {
+					if (actual.getGroup() == next.getGroup()) {
+						pointsToDeleteAmount++;
+						lastPointIndex = pointIndex;
+					} else {
+						lastPointIndex = pointIndex;
+						break;
+					}
 				} else {
-					lastPointIndex = pointIndex;
-					break;
+					if (actual.getGroup() == next.getGroup()) {
+						pointsToDeleteAmount++;
+					} else {
+						break;
+					}
 				}
 			}
 		} else {
 			for (int pointIndex = sorted.getValue().size() - 1; pointIndex > 1; pointIndex--) {
-				if (sorted.getValue().get(pointIndex).getGroup() == sorted.getValue().get(pointIndex - 1).getGroup()) {
-					pointsToDeleteAmount++;
+				Point actual = sorted.getValue().get(pointIndex);
+				Point next = sorted.getValue().get(pointIndex - 1);
+
+				if (!actual.getVector().get(coord).equals(next.getVector().get(coord))) {
+					if (actual.getGroup() == next.getGroup()) {
+						pointsToDeleteAmount++;
+						lastPointIndex = pointIndex;
+					} else {
+						lastPointIndex = pointIndex;
+						break;
+					}
 				} else {
-					lastPointIndex = pointIndex;
-					break;
+					if (actual.getGroup() == next.getGroup()) {
+						pointsToDeleteAmount++;
+					} else {
+						break;
+					}
 				}
 			}
 		}
 
+		if (lastPointIndex == 0) {
+			pointsToDeleteAmount = 0;
+		}
 		dataSet.setMaxPointsAmount(pointsToDeleteAmount);
-		dataSet.setMaxPointsCoord(sorted.getKey());
+		dataSet.setMaxPointsCoord(coord);
 		dataSet.setLastInPointIndex(lastPointIndex);
 		if (isAsc) {
 			dataSet.setFirstOutPointIndex(lastPointIndex + 1);
@@ -120,8 +149,7 @@ public class SpaceDivider {
 		DividingLine divideLine = new DividingLine();
 		divideLine.setCoordinate(DimensionEnum.values()[dataSet.getMaxPointsCoord()]);
 
-		BigDecimal afterLine = sortedPoints.get(dataSet.getMaxPointsCoord()).get(dataSet.getFirstOutPointIndex())
-				.getVector().get(dataSet.getMaxPointsCoord());
+		BigDecimal afterLine = sortedPoints.get(dataSet.getMaxPointsCoord()).get(dataSet.getFirstOutPointIndex()).getVector().get(dataSet.getMaxPointsCoord());
 
 		BigDecimal beforeLine = (dataSet.getLastInPointIndex() == sortedPoints.get(dataSet.getMaxPointsCoord()).size()) ?
 				BigDecimal.ZERO :

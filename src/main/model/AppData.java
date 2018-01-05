@@ -56,7 +56,12 @@ public class AppData {
 			List<BigDecimal> vector = new ArrayList<>();
 			for (int columnIndex = 0; columnIndex < data.keySet().size(); columnIndex++) {
 				if (columnIndex + 1 == data.keySet().size()) {
-					point.setGroup(Integer.parseInt(data.get(columnIndex).toArray()[rowIndex].toString()));
+					try {
+						point.setGroup(Integer.parseInt(data.get(columnIndex).toArray()[rowIndex].toString()));
+					} catch(NumberFormatException ex) {
+						Double val = Double.parseDouble(data.get(columnIndex).toArray()[rowIndex].toString());
+						point.setGroup(val.intValue());
+					}
 				} else {
 					BigDecimal value = new BigDecimal(data.get(columnIndex).toArray()[rowIndex].toString());
 					vector.add(value);
