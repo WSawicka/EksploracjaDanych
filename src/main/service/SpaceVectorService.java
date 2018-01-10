@@ -9,16 +9,18 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class SpaceVectorService {
 	private List<DividingLine> lines;
 	private int coordinatesAmount;
+	private List<Point> points;
 
 	public SpaceVectorService(List<DividingLine> lines) {
 		this.lines = lines;
 
-		List<Point> points = AppData.getInstance().getDataAsPoints();
+		points = AppData.getInstance().getDataAsPoints();
 		coordinatesAmount = points.get(0).getVector().size();
 	}
 
@@ -29,7 +31,7 @@ public class SpaceVectorService {
 			final int finalCoord = coordinate;
 			List<BigDecimal> coordinateValueList = new ArrayList<>();
 
-			coordinateValueList.add(BigDecimal.valueOf(Double.MIN_VALUE));
+			coordinateValueList.add(BigDecimal.valueOf(Double.MAX_VALUE * -1));
 			coordinateValueList.addAll(lines.stream().filter(line -> line.getCoordinate() == finalCoord).map(DividingLine::getValue)
 					.sorted(Comparator.comparingDouble(BigDecimal::doubleValue)).collect(Collectors.toList()));
 			coordinateValueList.add(BigDecimal.valueOf(Double.MAX_VALUE));
@@ -51,13 +53,22 @@ public class SpaceVectorService {
 			for (SpaceVector vector : vectors) {
 				BigDecimal min = vector.getCoordinateBorders().get(line.getCoordinate()).getMin();
 				BigDecimal max = vector.getCoordinateBorders().get(line.getCoordinate()).getMax();
-				if (min.doubleValue() == line.getValue().doubleValue() && !line.isAsc() ||
-						max.doubleValue() == line.getValue().doubleValue() && line.isAsc()) {
-					vector.getVector().add(true);
-					vector.setGroup(line.getGroupAccepted());
-				} else {
-					vector.getVector().add(false);
-				}
+                vector.getVector().add((min.doubleValue() == line.getValue().doubleValue() && !line.isAsc() ||
+						max.doubleValue() == line.getValue().doubleValue() && line.isAsc()));
+			}
+		}
+
+		for(SpaceVector vector : vectors) {
+			Set<Integer> group = points.stream()
+					.filter(point ->
+							point.getVector().get(0).doubleValue() >= vector.getCoordinateBorders().get(0).getMin().doubleValue() &&
+							point.getVector().get(0).doubleValue() <= vector.getCoordinateBorders().get(0).getMax().doubleValue())
+					.filter(point ->
+							point.getVector().get(1).doubleValue() >= vector.getCoordinateBorders().get(1).getMin().doubleValue() &&
+							point.getVector().get(1).doubleValue() <= vector.getCoordinateBorders().get(1).getMax().doubleValue())
+					.map(Point::getGroup).collect(Collectors.toSet());
+			if (group.stream().findFirst().isPresent()) {
+				vector.setGroup(group.stream().findFirst().get());
 			}
 		}
 

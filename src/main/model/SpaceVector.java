@@ -37,12 +37,10 @@ public class SpaceVector {
 		private BigDecimal max;
 
 		public String toString() {
-			String xmin = min.equals(BigDecimal.valueOf(Double.MIN_VALUE)) ? "-INFIN" : min.setScale(3, BigDecimal.ROUND_HALF_UP).toString();
+			String xmin = min.equals(BigDecimal.valueOf(Double.MAX_VALUE * -1)) ? "-INFIN" : min.setScale(3, BigDecimal.ROUND_HALF_UP).toString();
 			String xmax = max.equals(BigDecimal.valueOf(Double.MAX_VALUE)) ? "INFIN" : max.setScale(3, BigDecimal.ROUND_HALF_UP).toString();
-			String ymin = min.equals(BigDecimal.valueOf(Double.MIN_VALUE)) ? "-INFIN" : min.setScale(3, BigDecimal.ROUND_HALF_UP).toString();
-			String ymax = max.equals(BigDecimal.valueOf(Double.MAX_VALUE)) ? "INFIN" : max.setScale(3, BigDecimal.ROUND_HALF_UP).toString();
 
-			return "x[" + xmin + ", " + xmax + "]  y[" + ymin + ", " + ymax + "]";
+			return "[" + xmin + ", " + xmax + "]";
 		}
 	}
 }

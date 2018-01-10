@@ -11,4 +11,5 @@ public class DividingDataSet {
 	private int lastInPointIndex = 0;
 	private int firstOutPointIndex = 0;
 	private boolean isAsc = false;
+	private int inGroup = 0;
 }

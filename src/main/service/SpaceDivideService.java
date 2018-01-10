@@ -80,6 +80,7 @@ public class SpaceDivideService {
 		DividingDataSet dataSet = new DividingDataSet();
 		int pointsToDeleteAmount = 0;
 		int lastPointIndex = 0;
+		int lastGroup = 0;
 		int coord = sorted.getKey();
 
 		if (isAsc) {
@@ -91,14 +92,17 @@ public class SpaceDivideService {
 					if (actual.getGroup() == next.getGroup()) {
 						pointsToDeleteAmount++;
 						lastPointIndex = pointIndex;
+						lastGroup = actual.getGroup();
 					} else {
 						lastPointIndex = pointIndex;
+						lastGroup = actual.getGroup();
 						break;
 					}
 				} else {
 					if (actual.getGroup() == next.getGroup()) {
 						pointsToDeleteAmount++;
 					} else {
+						System.out.print(" ");
 						break;
 					}
 				}
@@ -112,14 +116,17 @@ public class SpaceDivideService {
 					if (actual.getGroup() == next.getGroup()) {
 						pointsToDeleteAmount++;
 						lastPointIndex = pointIndex;
+						lastGroup = actual.getGroup();
 					} else {
 						lastPointIndex = pointIndex;
+						lastGroup = actual.getGroup();
 						break;
 					}
 				} else {
 					if (actual.getGroup() == next.getGroup()) {
 						pointsToDeleteAmount++;
 					} else {
+						System.out.print(" ");
 						break;
 					}
 				}
@@ -139,6 +146,7 @@ public class SpaceDivideService {
 			dataSet.setFirstOutPointIndex(lastPointIndex - 1);
 			dataSet.setAsc(false);
 		}
+		dataSet.setInGroup(lastGroup);
 		return dataSet;
 	}
 
@@ -155,7 +163,7 @@ public class SpaceDivideService {
 		BigDecimal lineValue = (afterLine.add(beforeLine)).divide(BigDecimal.valueOf(2.0), BigDecimal.ROUND_HALF_UP);
 		divideLine.setValue(lineValue);
 		divideLine.setAsc(dataSet.isAsc());
-		divideLine.setGroupAccepted(sortedPoints.get(dataSet.getMaxPointsCoord()).get(dataSet.getLastInPointIndex()).getGroup());
+		divideLine.setGroupAccepted(dataSet.getInGroup());
 		return divideLine;
 	}
 
