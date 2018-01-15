@@ -18,6 +18,7 @@
             <Menu mnemonicParsing="false" text="Divide data">
               <items>
                 <MenuItem mnemonicParsing="false" onAction="#handleDivide" text="Divide into areas" />
+                  <MenuItem mnemonicParsing="false" onAction="#handleClassify" text="Classify" />
               </items>
             </Menu>
           <Menu mnemonicParsing="false" text="Chart">

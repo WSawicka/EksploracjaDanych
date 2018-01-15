@@ -1,5 +1,7 @@
 package main.service;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -14,10 +16,12 @@ import main.viewHelp.AlertWindow;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class SpaceDivideService {
 	private int coordinatesAmount;
 	private Map<Integer, List<Point>> sortedPoints = new HashMap<>();
+	private int deletedPoints = 0;
 
 	public SpaceDivideService() {
 		List<Point> points = AppData.getInstance().getDataAsPoints();
@@ -35,9 +39,17 @@ public class SpaceDivideService {
 		List<DividingLine> lines = new ArrayList<>();
 
 		while (true) {
-			DividingDataSet dataSet = getDataSet();
+			DividingDataSet dataSet = getDataSet(false);
 
-			if (dataSet.getMaxPointsAmount() + 1 == sortedPoints.get(dataSet.getMaxPointsCoord()).size() || dataSet.getMaxPointsAmount() == 0) {
+			int groupAmount = sortedPoints.get(dataSet.getMaxPointsCoord()).stream().map(Point::getGroup).collect(Collectors.toSet()).size();
+
+			if (dataSet.getMaxPointsAmount() + 1 == sortedPoints.get(dataSet.getMaxPointsCoord()).size() || groupAmount == 1
+					|| sortedPoints.get(dataSet.getMaxPointsCoord()).size() == 0) {
+				break;
+			}
+
+			if (dataSet.getMaxPointsAmount() == 0) {
+				//dataSet = getDataSet(true);
 				break;
 			}
 
@@ -51,20 +63,30 @@ public class SpaceDivideService {
 			}
 
 			sortPointsApartFrom(sortedPoints.get(dataSet.getMaxPointsCoord()), dataSet.getMaxPointsCoord());
+			deletedPoints += dataSet.getToDelete();
 		}
 
 		if (coordinatesAmount == 2) {
 			showChartWithLines(lines);
 		}
+		System.out.println("AMOUNT OF POINTS DELETED: " + deletedPoints);
 		return lines;
 	}
 
-	private DividingDataSet getDataSet() {
+	private DividingDataSet getDataSet(boolean withDelete) {
 		DividingDataSet dataSet = new DividingDataSet();
 
 		for (Map.Entry<Integer, List<Point>> sorted : sortedPoints.entrySet()) {
-			DividingDataSet newDataSetAsc = getDataFor(sorted, true);
-			DividingDataSet newDataSetDesc = getDataFor(sorted, false);
+			if (sorted.getValue().size() == 0) {
+				break;
+			}
+			DividingDataSet newDataSetAsc = (withDelete) ?
+					getDataWithDeleteFor(sorted.getKey(), sorted.getValue(), true) :
+					getDataFor(sorted.getKey(), sorted.getValue(), true);
+
+			DividingDataSet newDataSetDesc = (withDelete) ?
+					getDataWithDeleteFor(sorted.getKey(), sorted.getValue(), false) :
+					getDataFor(sorted.getKey(), sorted.getValue(), false);
 
 			if (dataSet.getMaxPointsAmount() < newDataSetAsc.getMaxPointsAmount()) {
 				dataSet = newDataSetAsc;
@@ -76,19 +98,18 @@ public class SpaceDivideService {
 		return dataSet;
 	}
 
-	private DividingDataSet getDataFor(Map.Entry<Integer, List<Point>> sorted, boolean isAsc) {
+	private DividingDataSet getDataFor(Integer sortedCoord, List<Point> sorted, boolean isAsc) {
 		DividingDataSet dataSet = new DividingDataSet();
 		int pointsToDeleteAmount = 0;
 		int lastPointIndex = 0;
 		int lastGroup = 0;
-		int coord = sorted.getKey();
 
 		if (isAsc) {
-			for (int pointIndex = 0; pointIndex < sorted.getValue().size() - 1; pointIndex++) {
-				Point actual = sorted.getValue().get(pointIndex);
-				Point next = sorted.getValue().get(pointIndex + 1);
+			for (int pointIndex = 0; pointIndex < sorted.size() - 1; pointIndex++) {
+				Point actual = sorted.get(pointIndex);
+				Point next = sorted.get(pointIndex + 1);
 
-				if (!actual.getVector().get(coord).equals(next.getVector().get(coord))) {
+				if (!actual.getVector().get(sortedCoord).equals(next.getVector().get(sortedCoord))) {
 					if (actual.getGroup() == next.getGroup()) {
 						pointsToDeleteAmount++;
 						lastPointIndex = pointIndex;
@@ -102,17 +123,16 @@ public class SpaceDivideService {
 					if (actual.getGroup() == next.getGroup()) {
 						pointsToDeleteAmount++;
 					} else {
-						System.out.print(" ");
 						break;
 					}
 				}
 			}
 		} else {
-			for (int pointIndex = sorted.getValue().size() - 1; pointIndex > 1; pointIndex--) {
-				Point actual = sorted.getValue().get(pointIndex);
-				Point next = sorted.getValue().get(pointIndex - 1);
+			for (int pointIndex = sorted.size() - 1; pointIndex > 1; pointIndex--) {
+				Point actual = sorted.get(pointIndex);
+				Point next = sorted.get(pointIndex - 1);
 
-				if (!actual.getVector().get(coord).equals(next.getVector().get(coord))) {
+				if (!actual.getVector().get(sortedCoord).equals(next.getVector().get(sortedCoord))) {
 					if (actual.getGroup() == next.getGroup()) {
 						pointsToDeleteAmount++;
 						lastPointIndex = pointIndex;
@@ -137,7 +157,7 @@ public class SpaceDivideService {
 			pointsToDeleteAmount = 0;
 		}
 		dataSet.setMaxPointsAmount(pointsToDeleteAmount);
-		dataSet.setMaxPointsCoord(coord);
+		dataSet.setMaxPointsCoord(sortedCoord);
 		dataSet.setLastInPointIndex(lastPointIndex);
 		if (isAsc) {
 			dataSet.setFirstOutPointIndex(lastPointIndex + 1);
@@ -150,6 +170,51 @@ public class SpaceDivideService {
 		return dataSet;
 	}
 
+	private DividingDataSet getDataWithDeleteFor(Integer sortedCoord, List<Point> sorted, boolean isAsc) {
+		BigDecimal value = null;
+		if (isAsc) {
+			value = sorted.get(0).getVector().get(sortedCoord);
+		} else {
+			value = sorted.get(sorted.size() - 1).getVector().get(sortedCoord);
+		}
+
+		BigDecimal finalValue = value;
+		List<Point> points = sorted.stream()
+				.filter(point -> point.getVector().get(sortedCoord).equals(finalValue)).collect(Collectors.toList());
+		Multimap<Integer, Point> groupedPoints = ArrayListMultimap.create();
+		points.forEach(point -> groupedPoints.put(point.getGroup(), point));
+
+		Map<Integer, DividingDataSet> groupedDataSets = new HashMap<>();
+
+		for (Integer group : groupedPoints.keySet()) {
+			List<Point> copySorted = new ArrayList<>(sorted);
+			copySorted.removeAll(groupedPoints.get(group));
+			groupedDataSets.put(group, getDataFor(sortedCoord, copySorted, isAsc));
+		}
+
+		int maxAmount = groupedDataSets.entrySet().stream()
+				.map(entry -> entry.getValue().getMaxPointsAmount()).mapToInt(Integer::intValue).max().getAsInt();
+		for (Map.Entry<Integer, DividingDataSet> entry : new HashMap<>(groupedDataSets).entrySet()) {
+			entry.getValue().setToDelete(groupedPoints.get(entry.getKey()).size());
+			if (entry.getValue().getMaxPointsAmount() != maxAmount) {
+				groupedDataSets.remove(entry.getKey(), entry.getValue());
+			}
+		}
+
+		if (groupedDataSets.keySet().size() > 1) {
+			int minToDelete = groupedDataSets.entrySet().stream()
+					.map(entry -> entry.getValue().getToDelete()).mapToInt(Integer::intValue).min().getAsInt();
+			for (Map.Entry<Integer, DividingDataSet> entry : new HashMap<>(groupedDataSets).entrySet()) {
+				if (entry.getValue().getToDelete() != minToDelete) {
+					groupedDataSets.remove(entry.getKey(), entry.getValue());
+				}
+			}
+		}
+
+		//map size is one or there's no difference between any of items, so get the first one
+		return groupedDataSets.values().iterator().next();
+	}
+
 	private DividingLine getLineFrom(DividingDataSet dataSet) {
 		DividingLine divideLine = new DividingLine();
 		divideLine.setCoordinate(dataSet.getMaxPointsCoord());
@@ -160,7 +225,7 @@ public class SpaceDivideService {
 				BigDecimal.ZERO :
 				sortedPoints.get(dataSet.getMaxPointsCoord()).get(dataSet.getLastInPointIndex()).getVector().get(dataSet.getMaxPointsCoord());
 
-		BigDecimal lineValue = (afterLine.add(beforeLine)).divide(BigDecimal.valueOf(2.0), BigDecimal.ROUND_HALF_UP);
+		BigDecimal lineValue = (afterLine.add(beforeLine)).divide(BigDecimal.valueOf(2.0), 6, BigDecimal.ROUND_HALF_UP);
 		divideLine.setValue(lineValue);
 		divideLine.setAsc(dataSet.isAsc());
 		divideLine.setGroupAccepted(dataSet.getInGroup());

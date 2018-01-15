@@ -3,10 +3,15 @@ package main.controller;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import lombok.Getter;
+import lombok.Setter;
 import main.model.DividingLine;
+import main.model.Point;
+import main.model.SpaceVector;
 import main.service.SpaceVectorService;
 import main.viewHelp.AlertWindow;
 import main.Chart2D;
@@ -19,11 +24,15 @@ import main.service.SpaceDivideService;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.List;
 
+@Setter
+@Getter
 public class MainWindowController {
 	private String filePath;
 	private AppData appData = AppData.getInstance();
+	private Point pointToClassify;
 
 	@FXML
 	private AnchorPane pane;
@@ -60,10 +69,29 @@ public class MainWindowController {
 
 	@FXML
 	private void handleDivide(ActionEvent event) throws Exception {
-		SpaceDivideService divideService = new SpaceDivideService();
-		List<DividingLine> lines = divideService.divide();
-		SpaceVectorService vectorService = new SpaceVectorService(lines);
-		vectorService.createVectors();
+		doDivideSpace();
+	}
+
+	@FXML
+	private void handleClassify(ActionEvent event) throws Exception {
+		if (appData.getVectors().isEmpty()) {
+			doDivideSpace();
+		}
+		FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/PointClassification.fxml"));
+		Parent root = loader.load();
+		PointClassificationController c = loader.getController();
+		Scene newScene = new Scene(root);
+		Stage newStage = new Stage();
+		newStage.setScene(newScene);
+		c.setSceneController(this);
+		newStage.showAndWait();
+
+
+		BigDecimal group = BigDecimal.ZERO;
+
+		AlertEnum alert = AlertEnum.OUTPUT;
+		alert.setText("Specified point is in group: " + group);
+		new AlertWindow().show(alert);
 	}
 
 	@FXML
@@ -87,5 +115,12 @@ public class MainWindowController {
 		spreadsheetView.setPrefSize(pane.getWidth(), pane.getHeight());
 		spreadsheetView.setEditable(false);
 		pane.getChildren().add(spreadsheetView);
+	}
+
+	private void doDivideSpace() throws IOException {
+		SpaceDivideService divideService = new SpaceDivideService();
+		List<DividingLine> lines = divideService.divide();
+		SpaceVectorService vectorService = new SpaceVectorService(lines);
+		appData.setVectors(vectorService.createVectors());
 	}
 }

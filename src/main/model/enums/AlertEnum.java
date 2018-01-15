@@ -12,7 +12,7 @@ public enum AlertEnum {
     INVALID_FILE_FORMAT("Invalid data format!", Alert.AlertType.ERROR),
     EMPTY_FILE("File is empty.", Alert.AlertType.ERROR),
     NOT_NUMERIC_VALUE("Wrong data type - only numbers!", Alert.AlertType.ERROR),
-    OUTPUT_KNN("", Alert.AlertType.INFORMATION),
+    OUTPUT("", Alert.AlertType.INFORMATION),
     NOT_MATCHING_COLUMN_SIZE("Data size don't match! different column size.", Alert.AlertType.ERROR);
 
     private String text;

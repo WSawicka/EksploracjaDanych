@@ -13,10 +13,12 @@ public class AppData {
 	private static AppData instance;
 	private Map<Integer, String> titles;
 	private Multimap<Integer, Object> data;
+	private List<SpaceVector> vectors;
 
 	private AppData() {
 		titles = new HashMap<>();
 		data = ArrayListMultimap.create();
+		vectors = new ArrayList<>();
 	}
 
 	public static AppData getInstance() {
@@ -71,5 +73,13 @@ public class AppData {
 			points.add(point);
 		}
 		return points;
+	}
+
+	public List<SpaceVector> getVectors() {
+		return vectors;
+	}
+
+	public void setVectors(List<SpaceVector> vectors) {
+		this.vectors = vectors;
 	}
 }

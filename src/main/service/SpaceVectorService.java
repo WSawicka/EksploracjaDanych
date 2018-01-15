@@ -24,7 +24,7 @@ public class SpaceVectorService {
 		coordinatesAmount = points.get(0).getVector().size();
 	}
 
-	public void createVectors() {
+	public List<SpaceVector> createVectors() {
 		List<List<BigDecimal>> sortedLineValues = new ArrayList<>();
 
 		for (int coordinate = 0; coordinate < coordinatesAmount; coordinate++) {
@@ -40,12 +40,15 @@ public class SpaceVectorService {
 
 		List<SpaceVector> vectors = new ArrayList<>();
 
-		for (int i = 0; i < sortedLineValues.get(0).size() - 1; i++) {
-			for (int j = 0; j < sortedLineValues.get(1).size() - 1; j++) {
-				SpaceVector vector = new SpaceVector();
-				vector.getCoordinateBorders().put(0, new SpaceVector.Border(sortedLineValues.get(0).get(i), sortedLineValues.get(0).get(i + 1)));
-				vector.getCoordinateBorders().put(1, new SpaceVector.Border(sortedLineValues.get(1).get(j), sortedLineValues.get(1).get(j + 1)));
-				vectors.add(vector);
+		//TODO: popraw dzielenie na przestrzenie dla danych wielowymiarowych!
+		for (int coord = 0; coord < coordinatesAmount; coord++) {
+			for (int i = 0; i < sortedLineValues.get(0).size() - 1; i++) {
+				for (int j = 0; j < sortedLineValues.get(1).size() - 1; j++) {
+					SpaceVector vector = new SpaceVector();
+					vector.getCoordinateBorders().put(0, new SpaceVector.Border(sortedLineValues.get(0).get(i), sortedLineValues.get(0).get(i + 1)));
+					vector.getCoordinateBorders().put(1, new SpaceVector.Border(sortedLineValues.get(1).get(j), sortedLineValues.get(1).get(j + 1)));
+					vectors.add(vector);
+				}
 			}
 		}
 
@@ -53,19 +56,19 @@ public class SpaceVectorService {
 			for (SpaceVector vector : vectors) {
 				BigDecimal min = vector.getCoordinateBorders().get(line.getCoordinate()).getMin();
 				BigDecimal max = vector.getCoordinateBorders().get(line.getCoordinate()).getMax();
-                vector.getVector().add((min.doubleValue() == line.getValue().doubleValue() && !line.isAsc() ||
+				vector.getVector().add((min.doubleValue() == line.getValue().doubleValue() && !line.isAsc() ||
 						max.doubleValue() == line.getValue().doubleValue() && line.isAsc()));
 			}
 		}
 
-		for(SpaceVector vector : vectors) {
+		for (SpaceVector vector : vectors) {
 			Set<Integer> group = points.stream()
 					.filter(point ->
 							point.getVector().get(0).doubleValue() >= vector.getCoordinateBorders().get(0).getMin().doubleValue() &&
-							point.getVector().get(0).doubleValue() <= vector.getCoordinateBorders().get(0).getMax().doubleValue())
+									point.getVector().get(0).doubleValue() <= vector.getCoordinateBorders().get(0).getMax().doubleValue())
 					.filter(point ->
 							point.getVector().get(1).doubleValue() >= vector.getCoordinateBorders().get(1).getMin().doubleValue() &&
-							point.getVector().get(1).doubleValue() <= vector.getCoordinateBorders().get(1).getMax().doubleValue())
+									point.getVector().get(1).doubleValue() <= vector.getCoordinateBorders().get(1).getMax().doubleValue())
 					.map(Point::getGroup).collect(Collectors.toSet());
 			if (group.stream().findFirst().isPresent()) {
 				vector.setGroup(group.stream().findFirst().get());
@@ -73,8 +76,10 @@ public class SpaceVectorService {
 		}
 
 		vectors.forEach(vector -> {
-			vector.getCoordinateBorders().forEach((k,v) -> System.out.print(v.toString() + " "));
+			vector.getCoordinateBorders().forEach((k, v) -> System.out.print(v.toString() + " "));
 			System.out.println("\t" + vector.getVectortoString() + " -> " + ((vector.getGroup() == null) ? "-" : vector.getGroup()));
 		});
+
+		return vectors;
 	}
 }
