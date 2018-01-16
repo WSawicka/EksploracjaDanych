@@ -9,18 +9,17 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import lombok.Getter;
 import lombok.Setter;
-import main.model.DividingLine;
-import main.model.Point;
-import main.model.SpaceVector;
-import main.service.SpaceVectorService;
-import main.viewHelp.AlertWindow;
 import main.Chart2D;
-import main.viewHelp.ExcelView;
 import main.file.ReadTxtFile;
 import main.file.ReadXlsFile;
-import main.model.enums.AlertEnum;
 import main.model.AppData;
+import main.model.DividingLine;
+import main.model.Point;
+import main.model.enums.AlertEnum;
 import main.service.SpaceDivideService;
+import main.service.SpaceVectorService;
+import main.viewHelp.AlertWindow;
+import main.viewHelp.ExcelView;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
 import java.io.IOException;
@@ -120,7 +119,26 @@ public class MainWindowController {
 	private void doDivideSpace() throws IOException {
 		SpaceDivideService divideService = new SpaceDivideService();
 		List<DividingLine> lines = divideService.divide();
+		appData.removeAllPoints(divideService.getAllDeletedPointsList());
+		if (appData.getTitles().size() == 3) {
+			showChartWithLines(lines);
+		}
 		SpaceVectorService vectorService = new SpaceVectorService(lines);
 		appData.setVectors(vectorService.createVectors());
+	}
+
+	private void showChartWithLines(List<DividingLine> lines) throws IOException {
+		FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/MainWindow.fxml"));
+		Scene newScene = new Scene(loader.load());
+		Stage newStage = new Stage();
+		newStage.setScene(newScene);
+
+		Chart2D chart = new Chart2D(newStage);
+		chart.setLines(lines);
+		try {
+			chart.showInWindow(0, 1, 2);
+		} catch (NumberFormatException nfex) {
+			new AlertWindow().show(AlertEnum.NOT_NUMERIC_VALUE);
+		}
 	}
 }
