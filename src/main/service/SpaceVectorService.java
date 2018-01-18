@@ -40,16 +40,16 @@ public class SpaceVectorService {
 
 		List<SpaceVector> vectors = new ArrayList<>();
 
-		//TODO: popraw dzielenie na przestrzenie dla danych wielowymiarowych!
+		//TODO: popraw dzielenie na przestrzenie dla danych wielowymiarowych
 		//for (int coord = 0; coord < coordinatesAmount; coord++) {
-			for (int i = 0; i < sortedLineValues.get(0).size() - 1; i++) {
-				for (int j = 0; j < sortedLineValues.get(1).size() - 1; j++) {
-					SpaceVector vector = new SpaceVector();
-					vector.getCoordinateBorders().put(0, new SpaceVector.Border(sortedLineValues.get(0).get(i), sortedLineValues.get(0).get(i + 1)));
-					vector.getCoordinateBorders().put(1, new SpaceVector.Border(sortedLineValues.get(1).get(j), sortedLineValues.get(1).get(j + 1)));
-					vectors.add(vector);
-				}
+		for (int i = 0; i < sortedLineValues.get(0).size() - 1; i++) {
+			for (int j = 0; j < sortedLineValues.get(1).size() - 1; j++) {
+				SpaceVector vector = new SpaceVector();
+				vector.getCoordinateBorders().put(0, new SpaceVector.Border(sortedLineValues.get(0).get(i), sortedLineValues.get(0).get(i + 1)));
+				vector.getCoordinateBorders().put(1, new SpaceVector.Border(sortedLineValues.get(1).get(j), sortedLineValues.get(1).get(j + 1)));
+				vectors.add(vector);
 			}
+		}
 		//}
 
 		for (DividingLine line : lines) {

@@ -22,7 +22,7 @@ import java.util.Map;
 
 @Getter
 @Setter
-public class ReadXlsFile {
+public class ReadXlsFile implements ReadFile {
 	private String filePath;
 	private Map<Integer, String> titles;
 	private Multimap<Integer, Object> map;
@@ -32,6 +32,7 @@ public class ReadXlsFile {
 		map = ArrayListMultimap.create();
 	}
 
+	@Override
 	public void readFile() throws IOException {
 		filePath = getFile();
 

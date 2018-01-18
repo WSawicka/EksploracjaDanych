@@ -10,12 +10,12 @@ import javafx.stage.Stage;
 import lombok.Getter;
 import lombok.Setter;
 import main.Chart2D;
+import main.file.ReadFile;
 import main.file.ReadTxtFile;
 import main.file.ReadXlsFile;
 import main.model.AppData;
 import main.model.DividingLine;
 import main.model.Point;
-import main.model.SpaceVector;
 import main.model.enums.AlertEnum;
 import main.service.ClassificationService;
 import main.service.SpaceDivideService;
@@ -25,9 +25,7 @@ import main.viewHelp.ExcelView;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
 
 @Setter
 @Getter
@@ -41,31 +39,15 @@ public class MainWindowController {
 
 	@FXML
 	private void handleOpenTxtFile(ActionEvent event) throws Exception {
-		ReadTxtFile readFile = new ReadTxtFile();
-		try {
-			readFile.readFile();
-			filePath = readFile.getFilePath();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		appData.setTitles(readFile.getTitles());
-		appData.setData(readFile.getMap());
-
+		ReadFile file = new ReadTxtFile();
+		doReadFile(file);
 		updateTableView();
 	}
 
 	@FXML
 	private void handleOpenXlsFile(ActionEvent event) throws Exception {
-		ReadXlsFile readFile = new ReadXlsFile();
-		try {
-			readFile.readFile();
-			filePath = readFile.getFilePath();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		appData.setTitles(readFile.getTitles());
-		appData.setData(readFile.getMap());
-
+		ReadFile file = new ReadXlsFile();
+		doReadFile(file);
 		updateTableView();
 	}
 
@@ -100,17 +82,23 @@ public class MainWindowController {
 
 	@FXML
 	private void handleShow2D(ActionEvent event) throws IOException {
-		FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/MainWindow.fxml"));
-		Scene newScene = new Scene(loader.load());
-		Stage newStage = new Stage();
-		newStage.setScene(newScene);
-
-		Chart2D chart = new Chart2D(newStage);
+		Chart2D chart = new Chart2D(getMainWindowStage());
 		try {
 			chart.showInWindow(0, 1, 2);
 		} catch (NumberFormatException nfex) {
 			new AlertWindow().show(AlertEnum.NOT_NUMERIC_VALUE);
 		}
+	}
+
+	private void doReadFile(ReadFile readFile) {
+		try {
+			readFile.readFile();
+			filePath = readFile.getFilePath();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		appData.setTitles(readFile.getTitles());
+		appData.setData(readFile.getMap());
 	}
 
 	private void updateTableView() {
@@ -133,17 +121,20 @@ public class MainWindowController {
 	}
 
 	private void showChartWithLines(List<DividingLine> lines) throws IOException {
-		FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/MainWindow.fxml"));
-		Scene newScene = new Scene(loader.load());
-		Stage newStage = new Stage();
-		newStage.setScene(newScene);
-
-		Chart2D chart = new Chart2D(newStage);
+		Chart2D chart = new Chart2D(getMainWindowStage());
 		chart.setLines(lines);
 		try {
 			chart.showInWindow(0, 1, 2);
 		} catch (NumberFormatException nfex) {
 			new AlertWindow().show(AlertEnum.NOT_NUMERIC_VALUE);
 		}
+	}
+
+	private Stage getMainWindowStage() throws IOException {
+		FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/MainWindow.fxml"));
+		Scene newScene = new Scene(loader.load());
+		Stage newStage = new Stage();
+		newStage.setScene(newScene);
+		return newStage;
 	}
 }

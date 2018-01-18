@@ -21,7 +21,7 @@ import java.util.stream.Stream;
 
 @Getter
 @Setter
-public class ReadTxtFile {
+public class ReadTxtFile implements ReadFile {
 	private String filePath;
 	private Map<Integer, String> titles;
 	private Multimap<Integer, Object> map;
@@ -31,6 +31,7 @@ public class ReadTxtFile {
 		map = ArrayListMultimap.create();
 	}
 
+	@Override
 	public void readFile() throws IOException {
 		filePath = getFile();
 

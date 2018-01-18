@@ -35,7 +35,6 @@ public class SpaceDivideService {
 
 		while (true) {
 			DividingDataSet dataSet = getDataSet(false);
-
 			int groupAmount = sortedPoints.get(dataSet.getMaxPointsCoord()).stream().map(Point::getGroup).collect(Collectors.toSet()).size();
 
 			if (dataSet.getMaxPointsAmount() + 1 == sortedPoints.get(dataSet.getMaxPointsCoord()).size() || groupAmount == 1
@@ -50,7 +49,6 @@ public class SpaceDivideService {
 					allDeletedPointsList.addAll(pointsToDeleteList);
 					pointsToDeleteList.clear();
 				}
-				//break;
 			}
 
 			lines.add(getLineFrom(dataSet));
@@ -216,10 +214,7 @@ public class SpaceDivideService {
 		List<Point> copySorted = new ArrayList<>(sorted);
 		copySorted.removeAll(groupedPoints.get(minToDeleteKey));
 		pointsToDeleteList.addAll(groupedPoints.get(minToDeleteKey));
-		DividingDataSet dataSet = getDataFor(sortedCoord, copySorted, isAsc);
-		//groupedDataSets.put(minToDeleteKey, asc);
-
-		return dataSet;
+		return getDataFor(sortedCoord, copySorted, isAsc);
 	}
 
 	private DividingLine getLineFrom(DividingDataSet dataSet) {
