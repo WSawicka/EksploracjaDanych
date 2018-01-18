@@ -85,7 +85,6 @@ public class MainWindowController {
 		c.setSceneController(this);
 		newStage.showAndWait();
 
-
 		BigDecimal group = BigDecimal.ZERO;
 
 		AlertEnum alert = AlertEnum.OUTPUT;

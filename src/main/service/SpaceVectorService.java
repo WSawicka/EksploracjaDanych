@@ -41,7 +41,7 @@ public class SpaceVectorService {
 		List<SpaceVector> vectors = new ArrayList<>();
 
 		//TODO: popraw dzielenie na przestrzenie dla danych wielowymiarowych!
-		for (int coord = 0; coord < coordinatesAmount; coord++) {
+		//for (int coord = 0; coord < coordinatesAmount; coord++) {
 			for (int i = 0; i < sortedLineValues.get(0).size() - 1; i++) {
 				for (int j = 0; j < sortedLineValues.get(1).size() - 1; j++) {
 					SpaceVector vector = new SpaceVector();
@@ -50,7 +50,7 @@ public class SpaceVectorService {
 					vectors.add(vector);
 				}
 			}
-		}
+		//}
 
 		for (DividingLine line : lines) {
 			for (SpaceVector vector : vectors) {
@@ -72,6 +72,14 @@ public class SpaceVectorService {
 					.map(Point::getGroup).collect(Collectors.toSet());
 			if (group.stream().findFirst().isPresent()) {
 				vector.setGroup(group.stream().findFirst().get());
+			} else {
+				for (DividingLine line : lines) {
+					if ((!line.isAsc() && line.getValue().compareTo(vector.getCoordinateBorders().get(line.getCoordinate()).getMin()) != 1) ||
+							(line.isAsc() && line.getValue().compareTo(vector.getCoordinateBorders().get(line.getCoordinate()).getMax()) != -1)) {
+						vector.setGroup(line.getGroupAccepted());
+						break;
+					}
+				}
 			}
 		}
 
