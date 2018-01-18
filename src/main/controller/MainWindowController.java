@@ -15,7 +15,9 @@ import main.file.ReadXlsFile;
 import main.model.AppData;
 import main.model.DividingLine;
 import main.model.Point;
+import main.model.SpaceVector;
 import main.model.enums.AlertEnum;
+import main.service.ClassificationService;
 import main.service.SpaceDivideService;
 import main.service.SpaceVectorService;
 import main.viewHelp.AlertWindow;
@@ -25,6 +27,7 @@ import org.controlsfx.control.spreadsheet.SpreadsheetView;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 @Setter
 @Getter
@@ -85,10 +88,13 @@ public class MainWindowController {
 		c.setSceneController(this);
 		newStage.showAndWait();
 
-		BigDecimal group = BigDecimal.ZERO;
+		if (pointToClassify == null) {
+			return;
+		}
 
+		ClassificationService classificationService = new ClassificationService();
 		AlertEnum alert = AlertEnum.OUTPUT;
-		alert.setText("Specified point is in group: " + group);
+		alert.setText("Specified point is in group: " + classificationService.getPointGroup(pointToClassify));
 		new AlertWindow().show(alert);
 	}
 
