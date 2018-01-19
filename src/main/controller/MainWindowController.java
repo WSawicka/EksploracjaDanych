@@ -116,6 +116,7 @@ public class MainWindowController {
 		if (appData.getTitles().size() == 3) {
 			showChartWithLines(lines);
 		}
+		System.out.println("LINES: " + lines.size());
 		SpaceVectorService vectorService = new SpaceVectorService(lines);
 		appData.setVectors(vectorService.createVectors());
 	}

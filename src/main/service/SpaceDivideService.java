@@ -51,13 +51,25 @@ public class SpaceDivideService {
 				}
 			}
 
-			lines.add(getLineFrom(dataSet));
+			if (sortedPoints.get(dataSet.getMaxPointsCoord()).size() >= dataSet.getFirstOutPointIndex()) {
+				lines.add(getLineFrom(dataSet));
+			} else {
+				dataSet.setFirstOutPointIndex(sortedPoints.get(dataSet.getMaxPointsCoord()).size());
+			}
 
 			int pointsAmount = sortedPoints.get(dataSet.getMaxPointsCoord()).size();
 			if (dataSet.isAsc()) {
 				sortedPoints.get(dataSet.getMaxPointsCoord()).subList(0, dataSet.getFirstOutPointIndex()).clear();
 			} else {
-				sortedPoints.get(dataSet.getMaxPointsCoord()).subList(dataSet.getLastInPointIndex(), pointsAmount).clear();
+				try {
+					sortedPoints.get(dataSet.getMaxPointsCoord()).subList(dataSet.getLastInPointIndex(), pointsAmount).clear();
+				} catch (IllegalArgumentException ex) {
+					try {
+						sortedPoints.get(dataSet.getMaxPointsCoord()).subList(dataSet.getLastInPointIndex() - 1, pointsAmount).clear();
+					} catch (IllegalArgumentException iex) {
+						sortedPoints.get(dataSet.getMaxPointsCoord()).subList(dataSet.getLastInPointIndex() - 2, pointsAmount).clear();
+					}
+				}
 			}
 
 			sortPointsApartFrom(sortedPoints.get(dataSet.getMaxPointsCoord()), dataSet.getMaxPointsCoord());
@@ -221,9 +233,12 @@ public class SpaceDivideService {
 		DividingLine divideLine = new DividingLine();
 		divideLine.setCoordinate(dataSet.getMaxPointsCoord());
 
-		BigDecimal afterLine = sortedPoints.get(dataSet.getMaxPointsCoord()).get(dataSet.getFirstOutPointIndex()).getVector().get(dataSet.getMaxPointsCoord());
 
-		BigDecimal beforeLine = (dataSet.getLastInPointIndex() == sortedPoints.get(dataSet.getMaxPointsCoord()).size()) ?
+		BigDecimal afterLine = (dataSet.getFirstOutPointIndex() >= sortedPoints.get(dataSet.getMaxPointsCoord()).size()) ?
+				BigDecimal.ZERO :
+				sortedPoints.get(dataSet.getMaxPointsCoord()).get(dataSet.getFirstOutPointIndex()).getVector().get(dataSet.getMaxPointsCoord());
+
+		BigDecimal beforeLine = (dataSet.getLastInPointIndex() >= sortedPoints.get(dataSet.getMaxPointsCoord()).size()) ?
 				BigDecimal.ZERO :
 				sortedPoints.get(dataSet.getMaxPointsCoord()).get(dataSet.getLastInPointIndex()).getVector().get(dataSet.getMaxPointsCoord());
 

@@ -40,17 +40,45 @@ public class SpaceVectorService {
 
 		List<SpaceVector> vectors = new ArrayList<>();
 
-		//TODO: popraw dzielenie na przestrzenie dla danych wielowymiarowych
-		//for (int coord = 0; coord < coordinatesAmount; coord++) {
-		for (int i = 0; i < sortedLineValues.get(0).size() - 1; i++) {
-			for (int j = 0; j < sortedLineValues.get(1).size() - 1; j++) {
-				SpaceVector vector = new SpaceVector();
-				vector.getCoordinateBorders().put(0, new SpaceVector.Border(sortedLineValues.get(0).get(i), sortedLineValues.get(0).get(i + 1)));
-				vector.getCoordinateBorders().put(1, new SpaceVector.Border(sortedLineValues.get(1).get(j), sortedLineValues.get(1).get(j + 1)));
-				vectors.add(vector);
+		if (coordinatesAmount == 2) {
+			for (int i = 0; i < sortedLineValues.get(0).size() - 1; i++) {
+				for (int j = 0; j < sortedLineValues.get(1).size() - 1; j++) {
+					SpaceVector vector = new SpaceVector();
+					vector.getCoordinateBorders().put(0, new SpaceVector.Border(sortedLineValues.get(0).get(i), sortedLineValues.get(0).get(i + 1)));
+					vector.getCoordinateBorders().put(1, new SpaceVector.Border(sortedLineValues.get(1).get(j), sortedLineValues.get(1).get(j + 1)));
+					vectors.add(vector);
+				}
 			}
+		} else if (coordinatesAmount == 3) {
+			for (int i = 0; i < sortedLineValues.get(0).size() - 1; i++) {
+				for (int j = 0; j < sortedLineValues.get(1).size() - 1; j++) {
+					for (int k = 0; k < sortedLineValues.get(2).size() - 1; k++) {
+						SpaceVector vector = new SpaceVector();
+						vector.getCoordinateBorders().put(0, new SpaceVector.Border(sortedLineValues.get(0).get(i), sortedLineValues.get(0).get(i + 1)));
+						vector.getCoordinateBorders().put(1, new SpaceVector.Border(sortedLineValues.get(1).get(j), sortedLineValues.get(1).get(j + 1)));
+						vector.getCoordinateBorders().put(2, new SpaceVector.Border(sortedLineValues.get(2).get(k), sortedLineValues.get(2).get(k + 1)));
+						vectors.add(vector);
+					}
+				}
+			}
+		} else if (coordinatesAmount == 4) {
+			for (int i = 0; i < sortedLineValues.get(0).size() - 1; i++) {
+				for (int j = 0; j < sortedLineValues.get(1).size() - 1; j++) {
+					for (int k = 0; k < sortedLineValues.get(2).size() - 1; k++) {
+						for (int l = 0; l < sortedLineValues.get(3).size() - 1; l++) {
+							SpaceVector vector = new SpaceVector();
+							vector.getCoordinateBorders().put(0, new SpaceVector.Border(sortedLineValues.get(0).get(i), sortedLineValues.get(0).get(i + 1)));
+							vector.getCoordinateBorders().put(1, new SpaceVector.Border(sortedLineValues.get(1).get(j), sortedLineValues.get(1).get(j + 1)));
+							vector.getCoordinateBorders().put(2, new SpaceVector.Border(sortedLineValues.get(2).get(k), sortedLineValues.get(2).get(k + 1)));
+							vector.getCoordinateBorders().put(3, new SpaceVector.Border(sortedLineValues.get(3).get(l), sortedLineValues.get(3).get(l + 1)));
+							vectors.add(vector);
+						}
+					}
+				}
+			}
+		} else {
+			return new ArrayList<>();
 		}
-		//}
 
 		for (DividingLine line : lines) {
 			for (SpaceVector vector : vectors) {
@@ -62,14 +90,46 @@ public class SpaceVectorService {
 		}
 
 		for (SpaceVector vector : vectors) {
-			Set<Integer> group = points.stream()
+			Set<Integer> group;
+			if (coordinatesAmount == 2) {
+				group =points.stream()
+						.filter(point ->
+								point.getVector().get(0).doubleValue() >= vector.getCoordinateBorders().get(0).getMin().doubleValue() &&
+										point.getVector().get(0).doubleValue() <= vector.getCoordinateBorders().get(0).getMax().doubleValue())
+						.filter(point ->
+								point.getVector().get(1).doubleValue() >= vector.getCoordinateBorders().get(1).getMin().doubleValue() &&
+										point.getVector().get(1).doubleValue() <= vector.getCoordinateBorders().get(1).getMax().doubleValue())
+						.map(Point::getGroup).collect(Collectors.toSet());
+			}
+			else if (coordinatesAmount ==3) {
+				group =points.stream()
+						.filter(point ->
+								point.getVector().get(0).doubleValue() >= vector.getCoordinateBorders().get(0).getMin().doubleValue() &&
+										point.getVector().get(0).doubleValue() <= vector.getCoordinateBorders().get(0).getMax().doubleValue())
+						.filter(point ->
+								point.getVector().get(1).doubleValue() >= vector.getCoordinateBorders().get(1).getMin().doubleValue() &&
+										point.getVector().get(1).doubleValue() <= vector.getCoordinateBorders().get(1).getMax().doubleValue())
+						.filter(point ->
+								point.getVector().get(2).doubleValue() >= vector.getCoordinateBorders().get(2).getMin().doubleValue() &&
+										point.getVector().get(2).doubleValue() <= vector.getCoordinateBorders().get(2).getMax().doubleValue())
+						.map(Point::getGroup).collect(Collectors.toSet());
+			}
+			else {
+				group =points.stream()
 					.filter(point ->
 							point.getVector().get(0).doubleValue() >= vector.getCoordinateBorders().get(0).getMin().doubleValue() &&
 									point.getVector().get(0).doubleValue() <= vector.getCoordinateBorders().get(0).getMax().doubleValue())
 					.filter(point ->
 							point.getVector().get(1).doubleValue() >= vector.getCoordinateBorders().get(1).getMin().doubleValue() &&
 									point.getVector().get(1).doubleValue() <= vector.getCoordinateBorders().get(1).getMax().doubleValue())
+						.filter(point ->
+								point.getVector().get(2).doubleValue() >= vector.getCoordinateBorders().get(2).getMin().doubleValue() &&
+										point.getVector().get(2).doubleValue() <= vector.getCoordinateBorders().get(2).getMax().doubleValue())
+						.filter(point ->
+								point.getVector().get(3).doubleValue() >= vector.getCoordinateBorders().get(3).getMin().doubleValue() &&
+										point.getVector().get(3).doubleValue() <= vector.getCoordinateBorders().get(3).getMax().doubleValue())
 					.map(Point::getGroup).collect(Collectors.toSet());
+			}
 			if (group.stream().findFirst().isPresent()) {
 				vector.setGroup(group.stream().findFirst().get());
 			} else {
